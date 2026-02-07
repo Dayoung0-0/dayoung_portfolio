@@ -1,5 +1,5 @@
 import FadeIn from "../components/FadeIn";
-import { profile, skillCategories, experiences, education } from "../data/portfolio";
+import { skillCategories, experiences, education } from "../data/portfolio";
 
 export default function About() {
   return (
