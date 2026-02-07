@@ -11,6 +11,44 @@ export default function ProjectModal({ project, onClose }: ProjectModalProps) {
   const imageBoxRef = useRef<HTMLDivElement>(null);
   const [currentImage, setCurrentImage] = useState(0);
   const [isScrollable, setIsScrollable] = useState(false);
+  const [zoom, setZoom] = useState(1);
+  const [isDragging, setIsDragging] = useState(false);
+  const dragStart = useRef({ x: 0, y: 0, scrollLeft: 0, scrollTop: 0 });
+
+  const zoomIn = () => setZoom((z) => Math.min(z + 0.25, 3));
+  const zoomOut = () => setZoom((z) => Math.max(z - 0.25, 1));
+  const zoomReset = () => setZoom(1);
+
+  const handleMouseDown = (e: React.MouseEvent) => {
+    const el = imageBoxRef.current;
+    if (!el || zoom <= 1) return;
+    e.preventDefault();
+    setIsDragging(true);
+    dragStart.current = {
+      x: e.clientX,
+      y: e.clientY,
+      scrollLeft: el.scrollLeft,
+      scrollTop: el.scrollTop,
+    };
+  };
+
+  useEffect(() => {
+    if (!isDragging) return;
+    const handleMouseMove = (e: MouseEvent) => {
+      const el = imageBoxRef.current;
+      if (!el) return;
+      e.preventDefault();
+      el.scrollLeft = dragStart.current.scrollLeft - (e.clientX - dragStart.current.x);
+      el.scrollTop = dragStart.current.scrollTop - (e.clientY - dragStart.current.y);
+    };
+    const handleMouseUp = () => setIsDragging(false);
+    document.addEventListener("mousemove", handleMouseMove);
+    document.addEventListener("mouseup", handleMouseUp);
+    return () => {
+      document.removeEventListener("mousemove", handleMouseMove);
+      document.removeEventListener("mouseup", handleMouseUp);
+    };
+  }, [isDragging]);
 
   useEffect(() => {
     document.body.style.overflow = "hidden";
@@ -25,8 +63,11 @@ export default function ProjectModal({ project, onClose }: ProjectModalProps) {
   }, [onClose]);
 
   useEffect(() => {
+    setZoom(1);
     const el = imageBoxRef.current;
     if (el) {
+      el.scrollTop = 0;
+      el.scrollLeft = 0;
       const check = () => setIsScrollable(el.scrollHeight > el.clientHeight + 4);
       check();
       const img = el.querySelector("img");
@@ -34,6 +75,19 @@ export default function ProjectModal({ project, onClose }: ProjectModalProps) {
       return () => img?.removeEventListener("load", check);
     }
   }, [currentImage]);
+
+  useEffect(() => {
+    const el = imageBoxRef.current;
+    if (!el) return;
+    const handleWheel = (e: WheelEvent) => {
+      if (e.ctrlKey || e.metaKey) {
+        e.preventDefault();
+        setZoom((z) => Math.min(Math.max(z - e.deltaY * 0.002, 1), 3));
+      }
+    };
+    el.addEventListener("wheel", handleWheel, { passive: false });
+    return () => el.removeEventListener("wheel", handleWheel);
+  }, []);
 
   const handleOverlayClick = (e: React.MouseEvent) => {
     if (e.target === overlayRef.current) onClose();
@@ -57,15 +111,50 @@ export default function ProjectModal({ project, onClose }: ProjectModalProps) {
           </svg>
         </button>
 
-        {/* Image - 박스 고정, 안에서 스크롤 */}
-        <div ref={imageBoxRef} className="w-full aspect-[1920/945] bg-mono-950 relative rounded-t-2xl overflow-y-auto scrollbar-hide">
-          <img
-            src={project.images[currentImage]}
-            alt={`${project.title} screenshot ${currentImage + 1}`}
-            className="w-full h-auto"
-          />
-          {/* 스크롤 힌트 - 이미지가 컨테이너보다 클 때만 표시 */}
-          <div className={`sticky bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-mono-950/90 to-transparent pointer-events-none flex items-end justify-center pb-2 transition-opacity ${isScrollable ? "opacity-100" : "opacity-0"}`}>
+        {/* Image - 박스 고정, 안에서 스크롤 + 확대/축소 */}
+        <div className="relative">
+          <div
+            ref={imageBoxRef}
+            onMouseDown={handleMouseDown}
+            className={`w-full aspect-[1920/945] bg-mono-950 rounded-t-2xl overflow-auto scrollbar-hide select-none ${zoom > 1 ? "cursor-grab" : ""} ${isDragging ? "!cursor-grabbing" : ""}`}
+          >
+            <div style={{ width: `${zoom * 100}%` }}>
+              <img
+                src={project.images[currentImage]}
+                alt={`${project.title} screenshot ${currentImage + 1}`}
+                className="w-full h-auto block"
+              />
+            </div>
+          </div>
+
+          {/* 줌 컨트롤 - 이미지 박스 위에 고정 */}
+          <div className="absolute top-3 left-3 z-10 flex items-center gap-1">
+            <button
+              onClick={zoomOut}
+              disabled={zoom <= 1}
+              className="w-7 h-7 flex items-center justify-center rounded-full bg-mono-0/70 text-mono-900 hover:bg-mono-0 transition-colors text-sm font-bold disabled:opacity-30 disabled:cursor-not-allowed"
+              aria-label="Zoom out"
+            >
+              −
+            </button>
+            <button
+              onClick={zoomReset}
+              className="h-7 px-2 flex items-center justify-center rounded-full bg-mono-0/70 text-mono-900 hover:bg-mono-0 transition-colors text-[11px] font-medium tabular-nums"
+            >
+              {Math.round(zoom * 100)}%
+            </button>
+            <button
+              onClick={zoomIn}
+              disabled={zoom >= 3}
+              className="w-7 h-7 flex items-center justify-center rounded-full bg-mono-0/70 text-mono-900 hover:bg-mono-0 transition-colors text-sm font-bold disabled:opacity-30 disabled:cursor-not-allowed"
+              aria-label="Zoom in"
+            >
+              +
+            </button>
+          </div>
+
+          {/* 스크롤 힌트 */}
+          <div className={`absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-mono-950/90 to-transparent pointer-events-none flex items-end justify-center pb-2 transition-opacity ${isScrollable && zoom === 1 ? "opacity-100" : "opacity-0"}`}>
             <div className="flex flex-col items-center gap-1 text-mono-300/80">
               <span className="text-[10px] uppercase tracking-wider">Scroll</span>
               <svg className="w-4 h-4 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24">
