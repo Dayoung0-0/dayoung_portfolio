@@ -1,0 +1,175 @@
+import { useEffect, useRef, useState } from "react";
+import type { Project } from "../data/portfolio";
+
+interface ProjectModalProps {
+  project: Project;
+  onClose: () => void;
+}
+
+export default function ProjectModal({ project, onClose }: ProjectModalProps) {
+  const overlayRef = useRef<HTMLDivElement>(null);
+  const imageBoxRef = useRef<HTMLDivElement>(null);
+  const [currentImage, setCurrentImage] = useState(0);
+  const [isScrollable, setIsScrollable] = useState(false);
+
+  useEffect(() => {
+    document.body.style.overflow = "hidden";
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", handleKey);
+    return () => {
+      document.body.style.overflow = "";
+      window.removeEventListener("keydown", handleKey);
+    };
+  }, [onClose]);
+
+  useEffect(() => {
+    const el = imageBoxRef.current;
+    if (el) {
+      const check = () => setIsScrollable(el.scrollHeight > el.clientHeight + 4);
+      check();
+      const img = el.querySelector("img");
+      img?.addEventListener("load", check);
+      return () => img?.removeEventListener("load", check);
+    }
+  }, [currentImage]);
+
+  const handleOverlayClick = (e: React.MouseEvent) => {
+    if (e.target === overlayRef.current) onClose();
+  };
+
+  return (
+    <div
+      ref={overlayRef}
+      onClick={handleOverlayClick}
+      className="fixed inset-0 z-[100] flex items-center justify-center bg-mono-0/80 p-4 sm:p-8"
+    >
+      <div className="relative bg-mono-1000 border border-mono-900 rounded-2xl w-full max-w-3xl max-h-[90vh] overflow-y-auto scrollbar-hide">
+        {/* Close button */}
+        <button
+          onClick={onClose}
+          className="absolute top-3 right-3 z-10 w-8 h-8 flex items-center justify-center rounded-full bg-mono-0/70 text-mono-900 hover:bg-mono-0 transition-colors"
+          aria-label="Close"
+        >
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+
+        {/* Image - 박스 고정, 안에서 스크롤 */}
+        <div ref={imageBoxRef} className="w-full aspect-[1920/945] bg-mono-950 relative rounded-t-2xl overflow-y-auto scrollbar-hide">
+          <img
+            src={project.images[currentImage]}
+            alt={`${project.title} screenshot ${currentImage + 1}`}
+            className="w-full h-auto"
+          />
+          {/* 스크롤 힌트 - 이미지가 컨테이너보다 클 때만 표시 */}
+          <div className={`sticky bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-mono-950/90 to-transparent pointer-events-none flex items-end justify-center pb-2 transition-opacity ${isScrollable ? "opacity-100" : "opacity-0"}`}>
+            <div className="flex flex-col items-center gap-1 text-mono-300/80">
+              <span className="text-[10px] uppercase tracking-wider">Scroll</span>
+              <svg className="w-4 h-4 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7" />
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        {/* 이미지 슬라이드 인디케이터 */}
+        {project.images.length > 1 && (
+          <div className="flex justify-center gap-2 py-3">
+            {project.images.map((_, i) => (
+              <button
+                key={i}
+                onClick={() => setCurrentImage(i)}
+                className={`w-2.5 h-2.5 rounded-full transition-colors ${
+                  i === currentImage
+                    ? "bg-accent-500"
+                    : "bg-mono-700 hover:bg-mono-500"
+                }`}
+                aria-label={`Image ${i + 1}`}
+              />
+            ))}
+          </div>
+        )}
+
+        {/* Content */}
+        <div className="p-6 sm:p-7">
+          <div className="flex items-center gap-3 mb-4">
+            <h2 className="text-xl sm:text-2xl font-semibold">{project.title}</h2>
+            <span className="text-xs text-accent-500 font-medium bg-accent-500/10 px-2 py-0.5 rounded-full">
+              {project.year}
+            </span>
+          </div>
+
+          <p className="text-mono-400 leading-relaxed mb-6">
+            {project.longDescription}
+          </p>
+
+          {/* Info grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+            <div className="bg-mono-950 rounded-lg p-4">
+              <h3 className="text-xs font-medium uppercase tracking-widest text-accent-500 mb-2">
+                Development Period
+              </h3>
+              <p className="text-sm text-mono-300">{project.period}</p>
+            </div>
+            <div className="bg-mono-950 rounded-lg p-4">
+              <h3 className="text-xs font-medium uppercase tracking-widest text-accent-500 mb-2">
+                Tech Stack
+              </h3>
+              <p className="text-sm text-mono-300">{project.techs.join(", ")}</p>
+            </div>
+          </div>
+
+          {/* Achievements */}
+          <div className="mb-6">
+            <h3 className="text-xs font-medium uppercase tracking-widest text-accent-500 mb-3">
+              Key Achievements
+            </h3>
+            <ul className="space-y-2">
+              {project.achievements.map((achievement, i) => (
+                <li key={i} className="flex gap-2 text-sm text-mono-300">
+                  <span className="text-accent-500 shrink-0 mt-0.5">&#10003;</span>
+                  {achievement}
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Links - 버튼 스타일 */}
+          {(project.github || project.site) && (
+            <div className="flex flex-wrap gap-3 pt-4 border-t border-mono-900 justify-end">
+              {project.github && (
+                <a
+                  href={project.github}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 text-sm font-medium border border-mono-800 text-mono-300 px-4 py-2 rounded-lg hover:border-accent-500 hover:text-accent-500 transition-colors"
+                >
+                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" />
+                  </svg>
+                  GitHub
+                </a>
+              )}
+              {project.site && (
+                <a
+                  href={project.site}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 text-sm font-medium bg-accent-600 text-white px-4 py-2 rounded-lg hover:bg-accent-500 transition-colors"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                  </svg>
+                  Site
+                </a>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
