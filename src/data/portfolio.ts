@@ -49,7 +49,7 @@ export const skillCategories: SkillCategory[] = [
     items: ["Java", "Spring", "Node.js", "Python (FastAPI)"],
   },
   {
-    category: "Database (Experience)",
+    category: "Infrastructure",
     items: ["MySQL", "MariaDB", "Redis"],
   },
   {
