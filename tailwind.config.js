@@ -7,7 +7,7 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['"Pretendard Variable"', '"Pretendard"', '"Inter"', 'system-ui', '-apple-system', 'sans-serif'],
+        sans: ['"Pretendard Variable"', '"Pretendard"', 'system-ui', '-apple-system', 'sans-serif'],
       },
       colors: {
         mono: {
@@ -35,20 +35,6 @@ export default {
           700: '#4338ca',
           800: '#3730a3',
           900: '#312e81',
-        },
-      },
-      animation: {
-        'fade-in': 'fadeIn 0.6s ease-out forwards',
-        'slide-up': 'slideUp 0.3s ease-out forwards',
-      },
-      keyframes: {
-        fadeIn: {
-          '0%': { opacity: '0', transform: 'translateY(16px)' },
-          '100%': { opacity: '1', transform: 'translateY(0)' },
-        },
-        slideUp: {
-          '0%': { opacity: '0', transform: 'translateY(24px)' },
-          '100%': { opacity: '1', transform: 'translateY(0)' },
         },
       },
     },

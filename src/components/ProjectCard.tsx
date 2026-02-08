@@ -31,25 +31,9 @@ export default function ProjectCard({ project, onClick }: ProjectCardProps) {
           {project.description}
         </p>
 
-        <div className="flex items-center justify-between">
-          <div className="flex flex-wrap gap-1.5">
-            {project.techs.slice(0, 2).map((tech) => (
-              <span
-                key={tech}
-                className="text-[11px] border border-mono-800 text-mono-500 px-2 py-0.5 rounded-full"
-              >
-                {tech}
-              </span>
-            ))}
-            {project.techs.length > 2 && (
-              <span className="text-[11px] text-mono-500 px-1">
-                +{project.techs.length - 2}
-              </span>
-            )}
-          </div>
-
+        <div className="flex justify-end">
           <span className="text-xs text-mono-500 group-hover:text-accent-500 group-hover:translate-x-0.5 transition-all">
-            View &rarr;
+            자세히 보기 &rarr;
           </span>
         </div>
       </div>

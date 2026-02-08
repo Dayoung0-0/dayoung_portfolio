@@ -1,15 +1,61 @@
-import { useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { useState, useCallback, useEffect } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 
-const links = [
-  { to: "/", label: "Home" },
-  { to: "/about", label: "About" },
-  { to: "/projects", label: "Projects" },
+const sections = [
+  { id: "intro", label: "소개" },
+  { id: "projects", label: "프로젝트" },
+  { id: "experience", label: "경력" },
+  { id: "skills", label: "기술 스택" },
 ];
 
 export default function Navigation() {
   const location = useLocation();
+  const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
+  const [activeSection, setActiveSection] = useState<string | null>(null);
+  const isAbout = location.pathname === "/portfolio";
+
+  useEffect(() => {
+    if (!isAbout) {
+      setActiveSection(null);
+      return;
+    }
+
+    const sectionIds = sections.map((s) => s.id);
+    const observers: IntersectionObserver[] = [];
+
+    sectionIds.forEach((id) => {
+      const el = document.getElementById(id);
+      if (!el) return;
+
+      const observer = new IntersectionObserver(
+        ([entry]) => {
+          if (entry.isIntersecting) {
+            setActiveSection(id);
+          }
+        },
+        { rootMargin: "-20% 0px -70% 0px" },
+      );
+
+      observer.observe(el);
+      observers.push(observer);
+    });
+
+    return () => observers.forEach((o) => o.disconnect());
+  }, [isAbout]);
+
+  const scrollToSection = useCallback(
+    (id: string) => {
+      setIsOpen(false);
+      if (isAbout) {
+        const el = document.getElementById(id);
+        if (el) el.scrollIntoView({ behavior: "smooth" });
+      } else {
+        navigate("/portfolio", { state: { scrollTo: id } });
+      }
+    },
+    [isAbout, navigate],
+  );
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-mono-1000/80 backdrop-blur-md border-b border-mono-900">
@@ -23,18 +69,30 @@ export default function Navigation() {
 
         {/* Desktop nav */}
         <ul className="hidden md:flex items-center gap-8">
-          {links.map(({ to, label }) => (
-            <li key={to}>
-              <Link
-                to={to}
+          <li>
+            <Link
+              to="/"
+              className={`text-sm transition-colors relative py-1 ${
+                location.pathname === "/"
+                  ? "text-mono-100 after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:bg-accent-500 after:rounded-full"
+                  : "text-mono-400 hover:text-mono-0"
+              }`}
+            >
+              홈
+            </Link>
+          </li>
+          {sections.map(({ id, label }) => (
+            <li key={id}>
+              <button
+                onClick={() => scrollToSection(id)}
                 className={`text-sm transition-colors relative py-1 ${
-                  location.pathname === to
+                  isAbout && activeSection === id
                     ? "text-mono-100 after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:bg-accent-500 after:rounded-full"
                     : "text-mono-400 hover:text-mono-0"
                 }`}
               >
                 {label}
-              </Link>
+              </button>
             </li>
           ))}
         </ul>
@@ -70,19 +128,31 @@ export default function Navigation() {
         }`}
       >
         <ul className="max-w-5xl mx-auto px-6 py-4 flex flex-col gap-4">
-          {links.map(({ to, label }) => (
-            <li key={to}>
-              <Link
-                to={to}
-                onClick={() => setIsOpen(false)}
+          <li>
+            <Link
+              to="/"
+              onClick={() => setIsOpen(false)}
+              className={`text-sm block transition-colors ${
+                location.pathname === "/"
+                  ? "text-accent-500"
+                  : "text-mono-400 hover:text-mono-0"
+              }`}
+            >
+              홈
+            </Link>
+          </li>
+          {sections.map(({ id, label }) => (
+            <li key={id}>
+              <button
+                onClick={() => scrollToSection(id)}
                 className={`text-sm block transition-colors ${
-                  location.pathname === to
+                  isAbout && activeSection === id
                     ? "text-accent-500"
                     : "text-mono-400 hover:text-mono-0"
                 }`}
               >
                 {label}
-              </Link>
+              </button>
             </li>
           ))}
         </ul>
