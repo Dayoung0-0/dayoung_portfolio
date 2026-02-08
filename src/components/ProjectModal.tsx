@@ -127,7 +127,7 @@ export default function ProjectModal({ project, onClose }: ProjectModalProps) {
       <div className="relative bg-mono-1000 border-t sm:border border-mono-900 sm:rounded-2xl w-full max-w-3xl h-[95vh] sm:h-auto sm:max-h-[90vh] overflow-y-auto scrollbar-hide rounded-t-2xl">
         {/* 모바일 상단 헤더 */}
         <div className="sticky top-0 z-20 flex items-center justify-between px-4 sm:px-6 py-3 bg-mono-1000/95 backdrop-blur-sm border-b border-mono-900 sm:hidden">
-          <h2 className="text-sm font-semibold truncate pr-4">{project.title}</h2>
+          <h2 className="text-base font-semibold truncate pr-4">{project.title}</h2>
           <button
             onClick={onClose}
             className="shrink-0 w-8 h-8 flex items-center justify-center rounded-full bg-mono-900 text-mono-300"
@@ -232,23 +232,23 @@ export default function ProjectModal({ project, onClose }: ProjectModalProps) {
 
           {/* 기간 - 모바일 */}
           <div className="sm:hidden mb-4">
-            <span className="text-xs text-accent-500 font-medium">{project.period}</span>
+            <span className="text-sm text-accent-500 font-medium">{project.period}</span>
           </div>
 
           {/* 서비스 소개 */}
           <div className="mb-5 sm:mb-6">
-            <h3 className="text-[13px] sm:text-sm font-semibold text-accent-500 mb-2 sm:mb-3">서비스 소개</h3>
-            <p className="text-[13px] sm:text-sm text-mono-300 leading-[1.8] sm:leading-[1.9] whitespace-pre-line">
+            <h3 className="text-base font-semibold text-accent-500 mb-2 sm:mb-3">서비스 소개</h3>
+            <p className="text-base text-mono-300 leading-[1.8] sm:leading-[1.9] whitespace-pre-line">
               {project.longDescription.trim()}
             </p>
           </div>
 
           {/* 담당 업무 */}
           <div className="mb-5 sm:mb-6">
-            <h3 className="text-[13px] sm:text-sm font-semibold text-accent-500 mb-2 sm:mb-3">담당 업무</h3>
+            <h3 className="text-base font-semibold text-accent-500 mb-2 sm:mb-3">담당 업무</h3>
             <ul className="space-y-2 sm:space-y-2.5">
               {project.achievements.map((achievement, i) => (
-                <li key={i} className="flex gap-2 sm:gap-2.5 text-[13px] sm:text-sm text-mono-300 leading-[1.7] sm:leading-relaxed">
+                <li key={i} className="flex gap-2 sm:gap-2.5 text-base text-mono-300 leading-[1.7] sm:leading-relaxed">
                   <span className="text-accent-500 shrink-0 mt-[2px]">&#8226;</span>
                   {achievement}
                 </li>
@@ -258,12 +258,12 @@ export default function ProjectModal({ project, onClose }: ProjectModalProps) {
 
           {/* 사용 기술 */}
           <div className="mb-5 sm:mb-6">
-            <h3 className="text-[13px] sm:text-sm font-semibold text-accent-500 mb-2 sm:mb-3">사용 기술</h3>
+            <h3 className="text-base font-semibold text-accent-500 mb-2 sm:mb-3">사용 기술</h3>
             <div className="flex flex-wrap gap-1.5 sm:gap-2">
               {project.techs.map((tech) => (
                 <span
                   key={tech}
-                  className="text-[12px] sm:text-[13px] text-mono-200 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full bg-accent-500/[0.08] border border-accent-500/20"
+                  className="text-sm text-mono-200 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full bg-accent-500/[0.08] border border-accent-500/20"
                 >
                   {tech}
                 </span>

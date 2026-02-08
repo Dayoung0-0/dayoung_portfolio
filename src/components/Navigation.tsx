@@ -62,7 +62,7 @@ export default function Navigation() {
       <div className="max-w-5xl mx-auto px-6 h-16 flex items-center justify-between">
         <Link
           to="/"
-          className="text-sm font-bold tracking-wide hover:text-accent-500 transition-colors"
+          className="text-base font-bold tracking-wide hover:text-accent-500 transition-colors"
         >
           DY<span className="text-accent-500">.</span>
         </Link>
@@ -72,7 +72,7 @@ export default function Navigation() {
           <li>
             <Link
               to="/"
-              className={`text-sm transition-colors relative py-1 ${
+              className={`text-base transition-colors relative py-1 ${
                 location.pathname === "/"
                   ? "text-mono-100 after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:bg-accent-500 after:rounded-full"
                   : "text-mono-400 hover:text-mono-0"
@@ -85,7 +85,7 @@ export default function Navigation() {
             <li key={id}>
               <button
                 onClick={() => scrollToSection(id)}
-                className={`text-sm transition-colors relative py-1 ${
+                className={`text-base transition-colors relative py-1 ${
                   isAbout && activeSection === id
                     ? "text-mono-100 after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:bg-accent-500 after:rounded-full"
                     : "text-mono-400 hover:text-mono-0"
@@ -132,7 +132,7 @@ export default function Navigation() {
             <Link
               to="/"
               onClick={() => setIsOpen(false)}
-              className={`text-sm block transition-colors ${
+              className={`text-base block transition-colors ${
                 location.pathname === "/"
                   ? "text-accent-500"
                   : "text-mono-400 hover:text-mono-0"
@@ -145,7 +145,7 @@ export default function Navigation() {
             <li key={id}>
               <button
                 onClick={() => scrollToSection(id)}
-                className={`text-sm block transition-colors ${
+                className={`text-base block transition-colors ${
                   isAbout && activeSection === id
                     ? "text-accent-500"
                     : "text-mono-400 hover:text-mono-0"

@@ -141,11 +141,11 @@ export default function Home() {
                   {item.icon}
                 </svg>
 
-                <span className="text-[13px] font-semibold text-mono-200 group-hover:text-accent-400 transition-colors">
+                <span className="text-base font-semibold text-mono-200 group-hover:text-accent-400 transition-colors">
                   {item.label}
                 </span>
 
-                <span className="text-[11px] text-mono-600">
+                <span className="text-sm text-mono-600">
                   {item.desc}
                 </span>
               </Link>
@@ -155,7 +155,7 @@ export default function Home() {
 
         {/* Links */}
         <FadeIn delay={450}>
-          <div className="flex flex-col items-center gap-2.5 text-[13px] text-mono-400">
+          <div className="flex flex-col items-center gap-2.5 text-base text-mono-400">
             <div className="flex items-center gap-x-5">
               <a href={profile.github} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 hover:text-accent-400 transition-colors">
                 <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">

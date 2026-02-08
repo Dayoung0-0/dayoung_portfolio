@@ -27,7 +27,7 @@ export default function ProjectCard({ project, onClick }: ProjectCardProps) {
           <span className="text-xs text-mono-500">{project.year}</span>
         </div>
 
-        <p className="text-sm text-mono-400 leading-relaxed mb-3 line-clamp-2">
+        <p className="text-base text-mono-400 leading-relaxed mb-3 line-clamp-2">
           {project.description}
         </p>
 
